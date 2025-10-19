@@ -18,7 +18,7 @@ var target_velocity = Vector3.ZERO
 
 
 func _physics_process(delta):
-	var direction = Vector3.ZERO
+	var direction: Vector3 = Vector3.ZERO
 
 	if Input.is_action_pressed("move_right"):
 		direction.x += 1
@@ -32,6 +32,7 @@ func _physics_process(delta):
 	if direction != Vector3.ZERO:
 		direction = direction.normalized()
 		# Setting the basis property will affect the rotation of the node.
+		@warning_ignore("unsafe_property_access")
 		$Pivot.basis = Basis.looking_at(direction)
 
 	# Ground Velocity
@@ -51,7 +52,7 @@ func _physics_process(delta):
 	move_and_slide()
 	
 	# Iterate through all collisions that occurred this frame
-	for index in range(get_slide_collision_count()):
+	for index: int in range(get_slide_collision_count()):
 		# We get one of the collisions with the player
 		var collision = get_slide_collision(index)
 
@@ -64,8 +65,9 @@ func _physics_process(delta):
 			continue
 
 		# If the collider is with a mob
-		if collision.get_collider().is_in_group("mob"):
-			var mob = collision.get_collider()
+		var collider: Node = collision.get_collider()
+		if collider.is_in_group("mob"):
+			var mob: Mob  = collider
 			# we check that we are hitting it from above.
 			if Vector3.UP.dot(collision.get_normal()) > 0.1:
 				# If so, we squash it and bounce.
@@ -78,5 +80,5 @@ func die():
 	hit.emit()
 	queue_free()
 
-func _on_mob_dedector_body_entered(body: Node3D) -> void:
+func _on_mob_dedector_body_entered(_body: Node3D) -> void:
 	die()
